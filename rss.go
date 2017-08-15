@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/SlyMarbo/rss"
-        "github.com/go-sql-driver/mysql"
 )
 
 func main() {
