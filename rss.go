@@ -1,15 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+
 	"github.com/SlyMarbo/rss"
-    //"github.com/go-sql-driver/mysql"
+	//"github.com/go-sql-driver/mysql"
+
 	"time"
+
+	"github.com/igor-anferov/RSS_agregator_telegram_bot/bot"
 )
 
 func main() {
-
-	rssFeedUrls := []string {
+	rssFeedUrls := []string{
 		"http://gazeta.ru/export/rss/lenta.xml",
 		"https://tvrain.ru/export/rss/all.xml",
 		"http://interfax.ru/rss.asp",
@@ -39,7 +42,9 @@ func main() {
 				panic(err)
 			}
 			for i := range rssFeeds[e].Items {
-				fmt.Println(rssFeeds[e].Items[i])
+				//fmt.Println(rssFeeds[e].Items[i])
+				res, _ := json.Marshal(rssFeeds[e].Items[i])
+				bot.SendMessageToIgor(string(res))
 			}
 			rssFeeds[e].Refresh = time.Now()
 			rssFeeds[e].Items = nil
