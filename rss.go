@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-
 	"github.com/SlyMarbo/rss"
 	//"github.com/go-sql-driver/mysql"
 
@@ -43,8 +41,8 @@ func main() {
 			}
 			for i := range rssFeeds[e].Items {
 				//fmt.Println(rssFeeds[e].Items[i])
-				res, _ := json.Marshal(rssFeeds[e].Items[i])
-				bot.SendMessageToIgor(string(res))
+				//res, _ := json.Marshal(rssFeeds[e].Items[i])
+				bot.SendMessageToIgor(rssFeeds[e].Items[i].Link)
 			}
 			rssFeeds[e].Refresh = time.Now()
 			rssFeeds[e].Items = nil
