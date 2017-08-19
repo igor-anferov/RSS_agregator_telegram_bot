@@ -6,26 +6,47 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"fmt"
 )
 
-type client struct {
+type Button struct {
+	Text string `json:"text"`
+	Url  string `json:"url"`
+}
+
+type ButtonsGrid struct {
+	Inline_keyboard [][]Button `json:"inline_keyboard"`
+}
+
+type message struct {
 	Chat_id    int    `json:"chat_id"`    // свойство FirstName будет преобразовано в ключ "name"
 	Text       string `json:"text"`       // свойство LastName будет преобразовано в ключ "lastname"
 	Parse_mode string `json:"parse_mode"` // свойство Books будет преобразовано в ключ "ordered_books"
+	Reply_markup ButtonsGrid `json:"reply_markup"`
 }
 
-func SendMessageToIgor(mes string) {
+func SendNews(chat_id int, title string, url string) {
 	bot_token := "441870254:AAHHaQbPt7abuqN97pD5nxGbtKhRIUUZGCI"
 	api_url := "https://api.telegram.org/bot" + bot_token + "/"
-	Igor := &client{
-		Chat_id:    86082823,
-		Text:       mes,
-		Parse_mode: "HTML",
+
+	newsMessage := message{
+		chat_id,
+		"<a href=\"" + url + "\">" + title + "</a>",
+		"HTML",
+		ButtonsGrid{
+			[][]Button {
+				{
+					{
+						"Смотреть подробнее",
+						url,
+					},
+				},
+			},
+		},
 	}
 
-	//user1, _ := json.Marshal(Igor)
-	//fmt.Println(string(user1))
 	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(Igor)
+	json.NewEncoder(buf).Encode(newsMessage)
+	fmt.Println(buf)
 	http.Post(api_url+"sendMessage", "application/json", buf)
 }

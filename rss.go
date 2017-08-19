@@ -7,6 +7,7 @@ import (
 	"time"
 	"github.com/igor-anferov/RSS_agregator_telegram_bot/bot"
 	"log"
+	"fmt"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 
 	rssFeedUrls := []string{
 		"http://gazeta.ru/export/rss/lenta.xml",
-		"https://tvrain.ru/export/rss/all.xml",
+		"http://tvrain.ru/export/rss/programs/1018.xml",
 		"http://interfax.ru/rss.asp",
 		"https://buzzfeed.com/index.xml",
 		"http://feeds.bbci.co.uk/news/world/rss.xml",
@@ -45,16 +46,18 @@ func main() {
 		for e := range rssFeeds {
 			err := rssFeeds[e].Update()
 			if err != nil {
-				log.Fatal(err)
+				log.Print(err)
+				log.Println(rssFeeds[e].Title)
 			}
 			for i := range rssFeeds[e].Items {
-				//fmt.Println(rssFeeds[e].Items[i])
+				fmt.Println(rssFeeds[e].Items[i])
 				//res, _ := json.Marshal(rssFeeds[e].Items[i])
-				bot.SendMessageToIgor("<a href=" + rssFeeds[e].Items[i].Link + "></a>")
+				bot.SendNews(86082823, rssFeeds[e].Items[i].Title, rssFeeds[e].Items[i].Link)
 			}
 			rssFeeds[e].Refresh = time.Now()
 			rssFeeds[e].Items = nil
 			rssFeeds[e].Unread = 0
 		}
+		time.Sleep(10*time.Second)
 	}
 }
