@@ -57,8 +57,8 @@ func main() {
 			}
 			for i := range rssFeeds[e].Items {
 				fmt.Println(rssFeeds[e].Items[i])
-				for e := range chats {
-					bot.SendNews(chats[e], rssFeeds[e].Items[i].Title, rssFeeds[e].Items[i].Link)
+				for k := range chats {
+					bot.SendNews(chats[k], rssFeeds[e].Items[i].Title, rssFeeds[e].Items[i].Link)
 				}
 			}
 			rssFeeds[e].Refresh = time.Now()
