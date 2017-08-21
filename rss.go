@@ -30,6 +30,11 @@ func main() {
 		"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
 	}
 
+	chats := []int {
+		86082823, // Igor
+		162650098, // Alisa
+	}
+
 	rssFeeds := make([]*rss.Feed, 0, len(rssFeedUrls))
 	for e := range rssFeedUrls {
 		result, err := rss.Fetch(rssFeedUrls[e])
@@ -51,8 +56,9 @@ func main() {
 			}
 			for i := range rssFeeds[e].Items {
 				fmt.Println(rssFeeds[e].Items[i])
-				//res, _ := json.Marshal(rssFeeds[e].Items[i])
-				bot.SendNews(86082823, rssFeeds[e].Items[i].Title, rssFeeds[e].Items[i].Link)
+				for e := range chats {
+					bot.SendNews(chats[e], rssFeeds[e].Items[i].Title, rssFeeds[e].Items[i].Link)
+				}
 			}
 			rssFeeds[e].Refresh = time.Now()
 			rssFeeds[e].Items = nil
