@@ -31,8 +31,9 @@ func main() {
 	}
 
 	chats := []int {
-		86082823, // Igor
+		86082823,  // Igor
 		162650098, // Alisa
+		89682072,  // Natalya
 	}
 
 	rssFeeds := make([]*rss.Feed, 0, len(rssFeedUrls))
