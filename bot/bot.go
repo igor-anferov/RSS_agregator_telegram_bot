@@ -47,6 +47,5 @@ func SendNews(chat_id int, title string, url string) {
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(newsMessage)
-	fmt.Println(buf)
 	http.Post(api_url+"sendMessage", "application/json", buf)
 }
