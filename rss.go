@@ -1,23 +1,61 @@
 package main
 
 import (
-	"github.com/SlyMarbo/rss"
-    "database/sql"
-    _ "github.com/go-sql-driver/mysql"
-	"time"
-	"github.com/igor-anferov/RSS_agregator_telegram_bot/bot"
-	"log"
 	"fmt"
+	"log"
+	"time"
+
+	"github.com/SlyMarbo/rss"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/igor-anferov/RSS_agregator_telegram_bot/bot"
+	"github.com/jinzhu/gorm"
 )
 
+type feed struct {
+	gorm.Model
+
+	ID       uint   `gorm:"primary_key"`
+	URL      string `gorm:"type:nvarchar(1024);unique_index;not null"`
+	Standard bool
+}
+
+func (feed) TableName() string {
+	return "feeds"
+}
+
+type user struct {
+	ID uint `gorm:"primary_key"`
+}
+
+func (user) TableName() string {
+	return "users"
+}
+
+type userFeed struct {
+	UserID     uint   `gorm:"not null"`
+	FeedID     uint   `gorm:"not null"`
+	Desription string `gorm:"type:nvarchar(1024);unique_index;not null"`
+
+	User user `gorm:"ForeignKey:UserID"`
+	Feed feed `gorm:"ForeignKey:FeedlID"`
+	ID   uint `gorm:"primary_key(UserID, FeedID)"`
+}
+
+func (userFeed) TableName() string {
+	return "users_feeds"
+}
+
 func main() {
-	db, err := sql.Open("mysql", "GO_mysql_connector:L65gUIfd7i9JGHr4jhgH@(127.0.0.1:3306)/RSS_agregator_telegram_bot")
+	db, err := gorm.Open("mysql", "GO_mysql_connector:L65gUIfd7i9JGHr4jhgH@(127.0.0.1:3306)/RSS_agregator_telegram_bot?parseTime=true")
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := db.Ping(); err != nil {
+	/*if err := db.Ping(); err != nil {
 		log.Fatal(err)
-	}
+	}*/
+	defer db.Close()
+
+	db.LogMode(true)
 
 	rssFeedUrls := []string{
 		"http://gazeta.ru/export/rss/lenta.xml",
@@ -30,7 +68,7 @@ func main() {
 		"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
 	}
 
-	chats := []int {
+	chats := []int{
 		86082823,  // Igor
 		162650098, // Alisa
 		89682072,  // Natalya
@@ -65,6 +103,6 @@ func main() {
 			rssFeeds[e].Items = nil
 			rssFeeds[e].Unread = 0
 		}
-		time.Sleep(10*time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
