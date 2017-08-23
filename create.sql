@@ -18,3 +18,13 @@ CREATE TABLE User_Feeds(
     description NVARCHAR(1024) NOT NULL UNIQUE,
     PRIMARY KEY(`user`, feed)
 );
+
+INSERT INTO Feeds(url, standard) VALUES
+	("http://gazeta.ru/export/rss/lenta.xml", true),
+	("http://tvrain.ru/export/rss/programs/1018.xml", true),
+	("http://interfax.ru/rss.asp", true),
+	("https://buzzfeed.com/index.xml", true),
+	("http://feeds.bbci.co.uk/news/world/rss.xml", true),
+	("http://news.rambler.ru/rss/world/", true),
+	("https://meduza.io/rss/all", true),
+	("http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml", true);
