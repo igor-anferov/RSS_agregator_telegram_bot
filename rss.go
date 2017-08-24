@@ -14,10 +14,14 @@ import (
 func main() {
 	var database = bd.Get()
 	defer database.Close()
-	var f bd.Feed
-	database.First(&f, 1)
-	fmt.Println(f.URL)
-	rssFeedUrls := []string{
+	//var f bd.Feed
+	var rssFeedUrls []string
+	rssFeedUrls = bd.MyPluck()
+	//database.First(&f, i)
+	fmt.Println(rssFeedUrls[1])
+	fmt.Println(bd.Select(7))
+
+	/*rssFeedUrls := []string{
 		"http://gazeta.ru/export/rss/lenta.xml",
 		"http://tvrain.ru/export/rss/programs/1018.xml",
 		"http://interfax.ru/rss.asp",
@@ -26,7 +30,7 @@ func main() {
 		"http://news.rambler.ru/rss/world/",
 		"https://meduza.io/rss/all",
 		"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-	}
+	}*/
 
 	chats := []int{
 		86082823,  // Igor

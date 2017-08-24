@@ -9,13 +9,13 @@ CREATE TABLE Feeds(
 );
 
 CREATE TABLE Users (
-	id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT
+	id INTEGER NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE User_Feeds(
 	`user`  INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     feed  INTEGER NOT NULL REFERENCES Feeds(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    description NVARCHAR(1024) NOT NULL UNIQUE,
+    description NVARCHAR(1024) DEFAULT NULL,
     PRIMARY KEY(`user`, feed)
 );
 
@@ -28,3 +28,14 @@ INSERT INTO Feeds(url, standard) VALUES
 	("http://news.rambler.ru/rss/world/", true),
 	("https://meduza.io/rss/all", true),
 	("http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml", true);
+    
+INSERT INTO Users VALUES
+		(86082823),  
+		(162650098), 
+		(89682072);    
+    
+INSERT INTO User_Feeds(`user`, feed) VALUES
+	(86082823, 2),
+    (86082823, 7),
+    (162650098, 7),
+    (89682072, 2);

@@ -56,3 +56,16 @@ func Get() *gorm.DB {
 func CreateFeed(url string, fl bool) {
 	bd.Create(&Feed{URL: url, Standard: fl})
 }
+
+func Select(id uint) []int {
+	var idU []int
+	bd.Table("Users").Select("Users.id").Joins("JOIN User_Feeds JOIN Feeds ON Users.id = User_Feeds.`user` AND User_Feeds.feed = Feeds.id").Where("Feeds.id = ?", id).Pluck("Users.id", &idU)
+
+	return idU
+}
+
+func MyPluck() []string {
+	var urlF []string
+	bd.Table("Feeds").Pluck("Feeds.url", &urlF)
+	return urlF
+}
