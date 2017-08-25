@@ -30,7 +30,7 @@ CREATE TABLE SystemInfo(
   lastUpdateId INTEGER PRIMARY KEY
 );
 
-INSERT INTO SystemInfo(lastUpdateId) VALUE (0);
+INSERT INTO SystemInfo(lastUpdateId) VALUE (-1);
 
 INSERT INTO Feeds(url, standard) VALUES
 	("http://gazeta.ru/export/rss/lenta.xml", true),
@@ -43,6 +43,6 @@ INSERT INTO Feeds(url, standard) VALUES
 	("http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml", true);
 
 INSERT INTO BotCommands VALUES
-	(`myfeeds`,    `Show me my feeds`),
-	(`addfeed`,    `Add new feed to my feeds`),
-	(`removefeed`, `Remove feed from my feeds`);
+	("myfeeds",    "Show me my feeds"),
+	("addfeed",    "Add new feed to my feeds"),
+	("removefeed", "Remove feed from my feeds");

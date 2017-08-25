@@ -23,8 +23,8 @@ func userInterface() {
 		for e := range resp.Result {
 			switch *resp.Result[e].Message.Text {
 			case "/start":
-				//chats[resp.Result[e].Message.Chat.ID] = struct{}{}
-
+				//var user bd.User
+				bd.CreateUser(resp.Result[e].Message.Chat.ID)
 			case "/stop":
 				delete(chats, resp.Result[e].Message.Chat.ID)
 			}
@@ -37,9 +37,9 @@ func main() {
 
 	var rssFeedUrls []string
 	rssFeedUrls = bd.MyPluck()
-	//database.First(&f, i)
+
 	fmt.Println(rssFeedUrls[1])
-	fmt.Println(bd.Select(7))
+	//fmt.Println(bd.Select(7))
 
 	rssFeeds := make([]*rss.Feed, 0, len(rssFeedUrls))
 	for e := range rssFeedUrls {

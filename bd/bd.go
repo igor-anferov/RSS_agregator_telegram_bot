@@ -19,8 +19,7 @@ func (Feed) TableName() string {
 }
 
 type User struct {
-	gorm.Model
-	ID uint `gorm:"primary_key"`
+	ID int `gorm:"primary_key"`
 }
 
 func (User) TableName() string {
@@ -51,6 +50,10 @@ func init() {
 
 func CreateFeed(url string, fl bool) {
 	Bd.Create(&Feed{URL: url, Standard: fl})
+}
+
+func CreateUser(id int) {
+	Bd.Create(&User{ID: id})
 }
 
 func Select(id uint) []int {
