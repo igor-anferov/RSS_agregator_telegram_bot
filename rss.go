@@ -10,6 +10,37 @@ import (
 	"fmt"
 )
 
+var rssFeedUrls = []string{
+	"http://gazeta.ru/export/rss/lenta.xml",
+	"http://tvrain.ru/export/rss/programs/1018.xml",
+	"http://interfax.ru/rss.asp",
+	"https://buzzfeed.com/index.xml",
+	"http://feeds.bbci.co.uk/news/world/rss.xml",
+	"http://news.rambler.ru/rss/world/",
+	"https://meduza.io/rss/all",
+	"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+}
+
+var chats = map[int]struct{} {
+	86082823: {},  // Igor
+	162650098: {}, // Alisa
+	89682072: {},  // Natalya
+}
+
+func userInterface()  {
+	for true {
+		resp := bot.GetUpdates(300)
+		for e := range resp.Result {
+			switch *resp.Result[e].Message.Text {
+			case "/start":
+				chats[resp.Result[e].Message.Chat.ID] = struct{}{}
+			case "/stop":
+				delete(chats, resp.Result[e].Message.Chat.ID)
+			}
+		}
+	}
+}
+
 func main() {
 	db, err := sql.Open("mysql", "GO_mysql_connector:L65gUIfd7i9JGHr4jhgH@(127.0.0.1:3306)/RSS_agregator_telegram_bot")
 	if err != nil {
@@ -17,23 +48,6 @@ func main() {
 	}
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
-	}
-
-	rssFeedUrls := []string{
-		"http://gazeta.ru/export/rss/lenta.xml",
-		"http://tvrain.ru/export/rss/programs/1018.xml",
-		"http://interfax.ru/rss.asp",
-		"https://buzzfeed.com/index.xml",
-		"http://feeds.bbci.co.uk/news/world/rss.xml",
-		"http://news.rambler.ru/rss/world/",
-		"https://meduza.io/rss/all",
-		"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-	}
-
-	chats := []int {
-		86082823,  // Igor
-		162650098, // Alisa
-		89682072,  // Natalya
 	}
 
 	rssFeeds := make([]*rss.Feed, 0, len(rssFeedUrls))
@@ -48,6 +62,8 @@ func main() {
 		rssFeeds = append(rssFeeds, result)
 	}
 
+	go userInterface()
+
 	for true {
 		for e := range rssFeeds {
 			err := rssFeeds[e].Update()
@@ -58,7 +74,7 @@ func main() {
 			for i := range rssFeeds[e].Items {
 				fmt.Println(rssFeeds[e].Items[i])
 				for k := range chats {
-					bot.SendNews(chats[k], rssFeeds[e].Items[i].Title, rssFeeds[e].Items[i].Link)
+					bot.SendNews(k, rssFeeds[e].Items[i].Title, rssFeeds[e].Items[i].Link)
 				}
 			}
 			rssFeeds[e].Refresh = time.Now()
