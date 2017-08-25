@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var bd *gorm.DB
+var Bd *gorm.DB
 
 type Feed struct {
 	ID       uint   `gorm:"primary_key"`
@@ -41,31 +41,30 @@ func (userFeed) TableName() string {
 }
 
 func init() {
-	db, err := gorm.Open("mysql", "GO_mysql_connector:L65gUIfd7i9JGHr4jhgH@(127.0.0.1:3306)/RSS_agregator_telegram_bot?parseTime=true")
+	var err error
+	Bd, err = gorm.Open("mysql", "GO_mysql_connector:L65gUIfd7i9JGHr4jhgH@(127.0.0.1:3306)/RSS_agregator_telegram_bot?parseTime=true")
 	if err != nil {
 		log.Fatal(err)
 	}
-	bd = db
-	bd.LogMode(true)
-}
-
-func Get() *gorm.DB {
-	return bd
+	Bd.LogMode(true)
 }
 
 func CreateFeed(url string, fl bool) {
-	bd.Create(&Feed{URL: url, Standard: fl})
+	Bd.Create(&Feed{URL: url, Standard: fl})
 }
 
 func Select(id uint) []int {
 	var idU []int
-	bd.Table("Users").Select("Users.id").Joins("JOIN User_Feeds JOIN Feeds ON Users.id = User_Feeds.`user` AND User_Feeds.feed = Feeds.id").Where("Feeds.id = ?", id).Pluck("Users.id", &idU)
+	Bd.Table("Users").Select("Users.id").Joins("JOIN User_Feeds JOIN Feeds ON Users.id = User_Feeds.`user` AND User_Feeds.feed = Feeds.id").Where("Feeds.id = ?", id).Pluck("Users.id", &idU)
 
 	return idU
 }
 
 func MyPluck() []string {
 	var urlF []string
-	bd.Table("Feeds").Pluck("Feeds.url", &urlF)
+	err := Bd.Table("Feeds").Pluck("Feeds.url", &urlF).Error
+	if err != nil {
+		log.Fatal(err)
+	}
 	return urlF
 }

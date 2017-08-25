@@ -11,19 +11,20 @@ import (
 	"github.com/igor-anferov/RSS_agregator_telegram_bot/bot"
 )
 
-var chats = map[int]struct{} {
-	86082823: {},  // Igor
+var chats = map[int]struct{}{
+	86082823:  {}, // Igor
 	162650098: {}, // Alisa
-	89682072: {},  // Natalya
+	89682072:  {}, // Natalya
 }
 
-func userInterface()  {
+func userInterface() {
 	for true {
 		resp := bot.GetUpdates(300)
 		for e := range resp.Result {
 			switch *resp.Result[e].Message.Text {
 			case "/start":
-				chats[resp.Result[e].Message.Chat.ID] = struct{}{}
+				//chats[resp.Result[e].Message.Chat.ID] = struct{}{}
+
 			case "/stop":
 				delete(chats, resp.Result[e].Message.Chat.ID)
 			}
@@ -32,9 +33,8 @@ func userInterface()  {
 }
 
 func main() {
-	var database = bd.Get()
-	defer database.Close()
-	//var f bd.Feed
+	defer bd.Bd.Close()
+
 	var rssFeedUrls []string
 	rssFeedUrls = bd.MyPluck()
 	//database.First(&f, i)
