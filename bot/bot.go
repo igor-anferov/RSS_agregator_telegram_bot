@@ -73,13 +73,17 @@ type GetUpdatesResponse struct {
 }
 
 func GetUpdates(timeout int) GetUpdatesResponse {
-	var system bd.SystemInfo
+	var update []int
+	err := bd.Bd.Table("SystemInfo").Pluck("SystemInfo.lastUpdateId", &update).Error
+	if err != nil {
+		log.Fatal(err)
+	}
 	getUpdtsReq := struct {
 		Offset  int `json:"offset"`
 		Limit   int `json:"limit"`
 		Timeout int `json:"timeout"`
 	}{
-		system.LastUpdateID + 1,
+		update[0] + 1,
 		1,
 		timeout,
 	}
