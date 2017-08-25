@@ -22,7 +22,7 @@ type ButtonsGrid struct {
 	Inline_keyboard [][]Button `json:"inline_keyboard"`
 }
 
-type SendMessage struct {
+type SendMessageReq struct {
 	Chat_id      int         `json:"chat_id"`    // свойство FirstName будет преобразовано в ключ "name"
 	Text         string      `json:"text"`       // свойство LastName будет преобразовано в ключ "lastname"
 	Parse_mode   string      `json:"parse_mode"` // свойство Books будет преобразовано в ключ "ordered_books"
@@ -116,7 +116,7 @@ func GetUpdates(timeout int) GetUpdatesResponse {
 }
 
 func SendNews(chat_id int, title string, url string) {
-	newsMessage := SendMessage{
+	newsMessage := SendMessageReq{
 		chat_id,
 		"<a href=\"" + url + "\">" + title + "</a>",
 		"HTML",
@@ -129,6 +129,22 @@ func SendNews(chat_id int, title string, url string) {
 					},
 				},
 			},
+		},
+	}
+
+	buf := new(bytes.Buffer)
+	json.NewEncoder(buf).Encode(newsMessage)
+	http.Post(api_url+"sendMessage", "application/json", buf)
+}
+
+func SendMessage(chat_id int, text string) {
+
+	newsMessage := SendMessageReq{
+		chat_id,
+		text,
+		"HTML",
+		ButtonsGrid{
+			[][]Button{},
 		},
 	}
 
