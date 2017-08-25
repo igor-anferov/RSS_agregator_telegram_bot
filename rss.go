@@ -1,25 +1,15 @@
 package main
 
 import (
-	"github.com/SlyMarbo/rss"
-    "database/sql"
-    _ "github.com/go-sql-driver/mysql"
-	"time"
-	"github.com/igor-anferov/RSS_agregator_telegram_bot/bot"
-	"log"
 	"fmt"
-)
+	"log"
+	"time"
 
-var rssFeedUrls = []string{
-	"http://gazeta.ru/export/rss/lenta.xml",
-	"http://tvrain.ru/export/rss/programs/1018.xml",
-	"http://interfax.ru/rss.asp",
-	"https://buzzfeed.com/index.xml",
-	"http://feeds.bbci.co.uk/news/world/rss.xml",
-	"http://news.rambler.ru/rss/world/",
-	"https://meduza.io/rss/all",
-	"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-}
+	"github.com/SlyMarbo/rss"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/igor-anferov/RSS_agregator_telegram_bot/bd"
+	"github.com/igor-anferov/RSS_agregator_telegram_bot/bot"
+)
 
 var chats = map[int]struct{} {
 	86082823: {},  // Igor
@@ -42,13 +32,14 @@ func userInterface()  {
 }
 
 func main() {
-	db, err := sql.Open("mysql", "GO_mysql_connector:L65gUIfd7i9JGHr4jhgH@(127.0.0.1:3306)/RSS_agregator_telegram_bot")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := db.Ping(); err != nil {
-		log.Fatal(err)
-	}
+	var database = bd.Get()
+	defer database.Close()
+	//var f bd.Feed
+	var rssFeedUrls []string
+	rssFeedUrls = bd.MyPluck()
+	//database.First(&f, i)
+	fmt.Println(rssFeedUrls[1])
+	fmt.Println(bd.Select(7))
 
 	rssFeeds := make([]*rss.Feed, 0, len(rssFeedUrls))
 	for e := range rssFeedUrls {
@@ -81,6 +72,6 @@ func main() {
 			rssFeeds[e].Items = nil
 			rssFeeds[e].Unread = 0
 		}
-		time.Sleep(10*time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
