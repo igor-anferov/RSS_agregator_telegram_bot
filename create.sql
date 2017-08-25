@@ -21,6 +21,17 @@ CREATE TABLE User_Feeds(
     FOREIGN KEY (feed) REFERENCES Feeds(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE BotCommands(
+  command NCHAR(20) PRIMARY KEY,
+  description NVARCHAR(1024) NOT NULL
+);
+
+CREATE TABLE SystemInfo(
+  lastUpdateId INTEGER PRIMARY KEY
+);
+
+INSERT INTO SystemInfo(lastUpdateId) VALUE (0);
+
 INSERT INTO Feeds(url, standard) VALUES
 	("http://gazeta.ru/export/rss/lenta.xml", true),
 	("http://tvrain.ru/export/rss/programs/1018.xml", true),
@@ -30,14 +41,8 @@ INSERT INTO Feeds(url, standard) VALUES
 	("http://news.rambler.ru/rss/world/", true),
 	("https://meduza.io/rss/all", true),
 	("http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml", true);
-    
-INSERT INTO Users VALUES
-		(86082823),  
-		(162650098), 
-		(89682072);    
-    
-INSERT INTO User_Feeds(`user`, feed) VALUES
-	(86082823, 2),
-    (86082823, 7),
-    (162650098, 7),
-    (89682072, 2)
+
+INSERT INTO BotCommands VALUES
+	(`myfeeds`,    `Show me my feeds`),
+	(`addfeed`,    `Add new feed to my feeds`),
+	(`removefeed`, `Remove feed from my feeds`);
