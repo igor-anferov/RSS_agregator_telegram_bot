@@ -23,10 +23,24 @@ func userInterface() {
 		for e := range resp.Result {
 			switch *resp.Result[e].Message.Text {
 			case "/start":
-				//var user bd.User
 				bd.CreateUser(resp.Result[e].Message.Chat.ID)
-			case "/stop":
-				delete(chats, resp.Result[e].Message.Chat.ID)
+			case "/myfeeds":
+				feeds := bd.GetFeedsByUserId(resp.Result[e].Message.Chat.ID)
+				text := "<b>🗞 Your feeds:</b>\n"
+				for e := range feeds {
+					if feeds[e].Description == nil {
+						result, err := rss.Fetch(feeds[e].Url)
+						if err != nil {
+							log.Println(err)
+							continue
+						}
+						feeds[e].Description = &result.Title
+					}
+					text += "▪️ " + *feeds[e].Description + "\n"
+				}
+				bot.SendMessage(resp.Result[e].Message.Chat.ID, text)
+			default:
+				bot.SendMessage(resp.Result[e].Message.Chat.ID, "Sorry, I don't understood you")
 			}
 		}
 	}

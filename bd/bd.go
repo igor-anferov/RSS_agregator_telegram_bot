@@ -70,11 +70,27 @@ func CreateUser(id int) {
 	Bd.Create(&User{ID: id})
 }
 
-func Select(id uint) []int {
+func GetUsersByFeedId(id int) []int {
 	var idU []int
 	Bd.Table("Users").Select("Users.id").Joins("JOIN User_Feeds JOIN Feeds ON Users.id = User_Feeds.`user` AND User_Feeds.feed = Feeds.id").Where("Feeds.id = ?", id).Pluck("Users.id", &idU)
 
 	return idU
+}
+
+type UserFeeds struct {
+	Url string
+	Description *string
+}
+
+func GetFeedsByUserId(id int) []UserFeeds {
+	var feeds []UserFeeds
+	err := Bd.Table("Feeds").Joins("JOIN User_Feeds JOIN Users ON Users.id = User_Feeds.`user` AND User_Feeds.feed = Feeds.id").Where("Users.id = ?", id).Select("Feeds.url, User_Feeds.description").Find(&feeds).Error
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	return feeds
 }
 
 func MyPluck() []string {

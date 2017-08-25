@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/igor-anferov/RSS_agregator_telegram_bot/bd"
+	"fmt"
 )
 
 var bot_token = "441870254:AAHHaQbPt7abuqN97pD5nxGbtKhRIUUZGCI"
@@ -26,7 +27,7 @@ type SendMessageReq struct {
 	Chat_id      int         `json:"chat_id"`    // свойство FirstName будет преобразовано в ключ "name"
 	Text         string      `json:"text"`       // свойство LastName будет преобразовано в ключ "lastname"
 	Parse_mode   string      `json:"parse_mode"` // свойство Books будет преобразовано в ключ "ordered_books"
-	Reply_markup ButtonsGrid `json:"reply_markup"`
+	Reply_markup *ButtonsGrid `json:"reply_markup,omitempty"`
 }
 
 type User struct {
@@ -120,7 +121,7 @@ func SendNews(chat_id int, title string, url string) {
 		chat_id,
 		"<a href=\"" + url + "\">" + title + "</a>",
 		"HTML",
-		ButtonsGrid{
+		&ButtonsGrid{
 			[][]Button{
 				{
 					{
@@ -143,12 +144,11 @@ func SendMessage(chat_id int, text string) {
 		chat_id,
 		text,
 		"HTML",
-		ButtonsGrid{
-			[][]Button{},
-		},
+		nil,
 	}
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(newsMessage)
+	fmt.Println(buf)
 	http.Post(api_url+"sendMessage", "application/json", buf)
 }
