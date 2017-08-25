@@ -34,11 +34,25 @@ type userFeed struct {
 	User User `gorm:"ForeignKey:UserID"`
 	Feed Feed `gorm:"ForeignKey:FeedlID"`
 }
+type BotCommand struct {
+	Command     string `gorm:"type:nchar(20);primary_key"`
+	Description string `gorm:"type:nvarchar(1024);unique_index;not null"`
+}
 
+func (BotCommand) TableName() string {
+	return "BotCommands"
+}
 func (userFeed) TableName() string {
 	return "User_Feeds"
 }
 
+type SystemInfo struct {
+	LastUpdateID int `gorm:"primary_key"`
+}
+
+func (SystemInfo) TableName() string {
+	return "SystemInfo"
+}
 func init() {
 	var err error
 	Bd, err = gorm.Open("mysql", "GO_mysql_connector:L65gUIfd7i9JGHr4jhgH@(127.0.0.1:3306)/RSS_agregator_telegram_bot?parseTime=true")

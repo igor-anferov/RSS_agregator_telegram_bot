@@ -3,15 +3,15 @@ package bot
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
-	"log"
 	"io/ioutil"
+	"log"
+	"net/http"
+
+	"github.com/igor-anferov/RSS_agregator_telegram_bot/bd"
 )
 
 var bot_token = "441870254:AAHHaQbPt7abuqN97pD5nxGbtKhRIUUZGCI"
 var api_url = "https://api.telegram.org/bot" + bot_token + "/"
-
-var lastUpdateId = -1
 
 type Button struct {
 	Text string `json:"text"`
@@ -23,18 +23,18 @@ type ButtonsGrid struct {
 }
 
 type SendMessage struct {
-	Chat_id    int    `json:"chat_id"`    // свойство FirstName будет преобразовано в ключ "name"
-	Text       string `json:"text"`       // свойство LastName будет преобразовано в ключ "lastname"
-	Parse_mode string `json:"parse_mode"` // свойство Books будет преобразовано в ключ "ordered_books"
+	Chat_id      int         `json:"chat_id"`    // свойство FirstName будет преобразовано в ключ "name"
+	Text         string      `json:"text"`       // свойство LastName будет преобразовано в ключ "lastname"
+	Parse_mode   string      `json:"parse_mode"` // свойство Books будет преобразовано в ключ "ordered_books"
 	Reply_markup ButtonsGrid `json:"reply_markup"`
 }
 
 type User struct {
-	ID int `json:"id"`
-	Is_bot bool `json:"is_bot"`
-	First_name string `json:"first_name"`
-	Last_name *string `json:"last_name"`
-	Username *string `json:"username"`
+	ID            int     `json:"id"`
+	Is_bot        bool    `json:"is_bot"`
+	First_name    string  `json:"first_name"`
+	Last_name     *string `json:"last_name"`
+	Username      *string `json:"username"`
 	Language_code *string `json:"language_code"`
 }
 
@@ -43,48 +43,49 @@ type Chat struct {
 }
 
 type Message struct {
-	Message_id int `json:"message_id"`
-	From *User `json:"from"`
-	Chat Chat `json:"chat"`
-	Text *string `json:"text"`
+	Message_id int     `json:"message_id"`
+	From       *User   `json:"from"`
+	Chat       Chat    `json:"chat"`
+	Text       *string `json:"text"`
 }
 
 type InlineQuery struct {
-	ID string `json:"id"`
-	From User `json:"from"`
-	Query string `json:"query"`
+	ID     string `json:"id"`
+	From   User   `json:"from"`
+	Query  string `json:"query"`
 	Offset string `json:"offset"`
 }
 
 type Update struct {
-	Update_id int `json:"update_id"`
-	Message *Message `json:"message"`
-	Edited_message *Message `json:"edited_message"`
-	Channel_post *Message `json:"channel_post"`
-	Edited_channel_post *Message `json:"edited_channel_post"`
-	Inline_query *InlineQuery `json:"inline_query"`
+	Update_id           int          `json:"update_id"`
+	Message             *Message     `json:"message"`
+	Edited_message      *Message     `json:"edited_message"`
+	Channel_post        *Message     `json:"channel_post"`
+	Edited_channel_post *Message     `json:"edited_channel_post"`
+	Inline_query        *InlineQuery `json:"inline_query"`
 }
 
 type GetUpdatesResponse struct {
-	Ok bool `json:"ok"`
-	Error_code int `json:"error_code"`
-	Description string `json:"description"`
-	Result []Update `json:"result"`
+	Ok          bool     `json:"ok"`
+	Error_code  int      `json:"error_code"`
+	Description string   `json:"description"`
+	Result      []Update `json:"result"`
 }
 
 func GetUpdates(timeout int) GetUpdatesResponse {
+	var system bd.SystemInfo
 	getUpdtsReq := struct {
-		Offset int `json:"offset"`
-		Limit int `json:"limit"`
+		Offset  int `json:"offset"`
+		Limit   int `json:"limit"`
 		Timeout int `json:"timeout"`
 	}{
-		lastUpdateId + 1,
+		system.LastUpdateID + 1,
 		1,
 		timeout,
 	}
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(getUpdtsReq)
-	resp, err := http.Post(api_url+"getUpdates","application/json", buf);
+	resp, err := http.Post(api_url+"getUpdates", "application/json", buf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -105,7 +106,7 @@ func GetUpdates(timeout int) GetUpdatesResponse {
 		log.Print(response.Error_code, response.Description)
 	}
 	if len(response.Result) > 0 {
-		lastUpdateId = response.Result[0].Update_id
+		bd.Bd.Table("SystemInfo").Update("lastUpdateId", response.Result[0].Update_id)
 	}
 	return response
 }
@@ -116,7 +117,7 @@ func SendNews(chat_id int, title string, url string) {
 		"<a href=\"" + url + "\">" + title + "</a>",
 		"HTML",
 		ButtonsGrid{
-			[][]Button {
+			[][]Button{
 				{
 					{
 						"☝🏻  Смотреть подробнее  👀",
